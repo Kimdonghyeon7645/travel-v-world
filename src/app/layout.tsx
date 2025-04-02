@@ -25,6 +25,8 @@ export default function RootLayout({
           type="text/javascript"
           src={`http://map.vworld.kr/js/webglMapInit.js.do?version=3.0&apiKey=${process.env.NEXT_PUBLIC_VWORLD_MAP_KEY}`}
         />
+        {/* <script type="text/javascript" src="https://map.vworld.kr/js/dtkmap/tool3d/libapis/sunlight/sunlight_analysis_api.js"></script> */}
+        {/* <script type="text/javascript" src="http://localhost:8082/js/dtkmap/tool3d/libapis/sunlight/sunlight_analysis_api.js"></script> */}
       </head>
       <body className={`${pretendard.className} antialiased`}>{children}</body>
     </html>

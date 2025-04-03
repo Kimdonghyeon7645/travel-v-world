@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export const useAnalysisSunlight = (sendResult: (res: any[]) => void) => {
-  const [result, setResult] = useState<any[]>([]);
+  const result = useRef<any[]>([]);
   const selectPoint = useRef<any>(null);
 
   const _spotmarkerPin = "https://map.vworld.kr/js/dtkmap/tool3d/libapis/sunlight/spotmarkerS.png";
@@ -121,11 +121,12 @@ export const useAnalysisSunlight = (sendResult: (res: any[]) => void) => {
             });
           }
 
-          setResult((val) => [...val, { h0: hours - 1, h1: hours, sunLight: sunshine_time }]);
+          result.current.push({ h0: hours - 1, h1: hours, sunLight: sunshine_time });
         } else {
           setClock(null, { h: dttm.getHours(), m: dttm.getMinutes(), s: dttm.getSeconds() });
           drawSunObject();
-          sendResult(result);
+          console.log(result.current);
+          sendResult(result.current);
           return;
         }
         resolve();

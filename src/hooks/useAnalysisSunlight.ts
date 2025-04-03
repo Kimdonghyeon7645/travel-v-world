@@ -2,11 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const useAnalysisSunlight = (sendResult: (res: any[]) => void) => {
   const result = useRef<any[]>([]);
   const selectPoint = useRef<any>(null);
+  const [isPickMode, setIsPickMode] = useState<boolean>(false);
+  const [isSelectMode, setIsSelectMode] = useState<boolean>(false);
 
   const _spotmarkerPin = "https://map.vworld.kr/js/dtkmap/tool3d/libapis/sunlight/spotmarkerS.png";
   const _spotmarkerSunny = "https://map.vworld.kr/js/dtkmap/tool3d/libapis/sunlight/sunny.png";
@@ -48,7 +50,7 @@ export const useAnalysisSunlight = (sendResult: (res: any[]) => void) => {
   const drawSunObject = (callback?: any) => {
     if (!selectPoint.current) return;
 
-    ws3d.viewer.objectManager.removeGroupGeometries("SUN_OBJ");
+    // ws3d.viewer.objectManager.removeGroupGeometries("SUN_OBJ");
     const ThreeDTileLayerElement = ws3d.viewer.map.getElementArray();
     ws3d.viewer.navigation.createSunMarker(
       selectPoint.current,
@@ -83,12 +85,33 @@ export const useAnalysisSunlight = (sendResult: (res: any[]) => void) => {
     ws3d.viewer.canvas.style.cursor = "grab"; // 마우스 커서 변경
     ws3d.viewer.map.excludeTerrainModifierOnPicking = true; // 지형 수정 객체 피킹을 위해 옵션 수정
     ws3d.viewer.map.onPickingElement.removeEventListener(pickSunHandler);
+
+    setIsPickMode(false);
+    setIsSelectMode(true);
   };
 
   const pickPoint = () => {
     ws3d.viewer.canvas.style.cursor = "pointer"; // 마우스 커서 변경
     ws3d.viewer.map.excludeTerrainModifierOnPicking = false; // 지형 수정 객체 피킹을 위해 옵션 수정
     ws3d.viewer.map.onPickingElement.addEventListener(pickSunHandler);
+
+    setIsPickMode(true);
+  };
+
+  const canclePickMode = () => {
+    ws3d.viewer.canvas.style.cursor = "grab"; // 마우스 커서 변경
+    ws3d.viewer.map.excludeTerrainModifierOnPicking = true; // 지형 수정 객체 피킹을 위해 옵션 수정
+    ws3d.viewer.map.onPickingElement.removeEventListener(pickSunHandler);
+
+    setIsPickMode(false);
+  };
+
+  const clearMap = () => {
+    ws3d.viewer.objectManager.removeGroupGeometries("SUN_OBJ");
+    result.current = [];
+    sendResult([]);
+
+    setIsSelectMode(false);
   };
 
   /**
@@ -125,7 +148,6 @@ export const useAnalysisSunlight = (sendResult: (res: any[]) => void) => {
         } else {
           setClock(null, { h: dttm.getHours(), m: dttm.getMinutes(), s: dttm.getSeconds() });
           drawSunObject();
-          console.log(result.current);
           sendResult(result.current);
           return;
         }
@@ -136,5 +158,9 @@ export const useAnalysisSunlight = (sendResult: (res: any[]) => void) => {
   return {
     pickPoint,
     runSunlight,
+    canclePickMode,
+    clearMap,
+    isPickMode,
+    isSelectMode,
   };
 };
